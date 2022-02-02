@@ -1,10 +1,10 @@
+use first_server_multi_thread::ThreadPool;
+use std::fs;
 use std::io::prelude::*;
 use std::net::TcpListener;
 use std::net::TcpStream;
-use std::fs;
 use std::thread;
 use std::time::Duration;
-use first_server_multi_thread::ThreadPool;
 fn main() {
     let listener = TcpListener::bind("127.0.0.1:7878").unwrap(); //Return an instance of TCP and is bind beacause "binding to a port"
     let pool = ThreadPool::new(4);
@@ -15,8 +15,9 @@ fn main() {
             handle_connection(stream);
         });
     }
+    println!("Shutting down.");
 }
-fn handle_connection(mut stream: TcpStream){
+fn handle_connection(mut stream: TcpStream) {
     let mut buffer = [0; 1024];
     stream.read(&mut buffer).unwrap();
     // we convert the bytes in the buffer to a string and print that string.
@@ -32,16 +33,16 @@ fn handle_connection(mut stream: TcpStream){
     // conditional to define if the request is GET or the other type and asign to destructuring
     let (status_line, filename) = if buffer.starts_with(get) {
         ("HTTP/1.1 200 OK", "hello.html")
-    } else if buffer.starts_with(sleep){
+    } else if buffer.starts_with(sleep) {
         thread::sleep(Duration::from_secs(5));
         ("HTTP/1.1 200 OK", "hello.html")
-    }else {
+    } else {
         ("HTTP/1.1 404 NOT FOUND", "404.html")
     };
-   
+
     // Read HTML file
     let contents = fs::read_to_string(filename).unwrap();
-   
+
     // Build response
     // Option 1:
     // let response = "HTTP/1.1 200 OK\r\n\r\n";
